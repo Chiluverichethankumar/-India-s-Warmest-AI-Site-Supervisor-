@@ -61,7 +61,8 @@ function App() {
     setIsProcessing(true);
 
     try {
-      const res = await fetch('/api/message', {
+      // const res = await fetch('/api/message', {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/message`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ session_id: sessionId, text })
