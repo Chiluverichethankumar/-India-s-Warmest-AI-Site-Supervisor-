@@ -1,26 +1,36 @@
 // frontend/project/src/App.tsx
 import { useState, useRef, useEffect } from 'react';
-import { Mic, MicOff, Send, Volume2, Loader2 } from 'lucide-react';
-import.meta.env.VITE_API_URL
+import { Mic, MicOff, Send, Loader2 } from 'lucide-react';
+
+// -------------------- Environment variable for backend API --------------------
+// Make sure you have defined VITE_API_URL in your .env file, e.g.:
+// VITE_API_URL=http://localhost:8000
+const API_URL = import.meta.env.VITE_API_URL;
 
 interface Message {
-  type: 'user' | 'ai';
-  text: string;
-  timestamp: Date;
+  type: 'user' | 'ai'; // Message type: user or AI
+  text: string;         // Message text
+  timestamp: Date;      // Timestamp for display
 }
 
 function App() {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [inputText, setInputText] = useState('');
-  const [isListening, setIsListening] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [sessionId, setSessionId] = useState<string | null>(null);
-  const recognitionRef = useRef<any>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  // -------------------- State --------------------
+  const [messages, setMessages] = useState<Message[]>([]); // All chat messages
+  const [inputText, setInputText] = useState('');          // User input
+  const [isListening, setIsListening] = useState(false);   // Mic listening state
+  const [isProcessing, setIsProcessing] = useState(false); // Waiting for AI response
+  const [sessionId, setSessionId] = useState<string | null>(null); // Session ID
 
+  // -------------------- Refs --------------------
+  const recognitionRef = useRef<any>(null);      // Speech recognition ref
+  const messagesEndRef = useRef<HTMLDivElement>(null); // Scroll to bottom
+
+  // -------------------- Speech Recognition Setup --------------------
   useEffect(() => {
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      const SpeechRecognition =
+        (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
       recognitionRef.current = new SpeechRecognition();
       recognitionRef.current.lang = 'en-IN';
       recognitionRef.current.interimResults = false;
@@ -28,7 +38,7 @@ function App() {
 
       recognitionRef.current.onresult = (event: any) => {
         const text = event.results[0][0].transcript;
-        setInputText(text);
+        setInputText(text); // Fill textarea with recognized text
       };
 
       recognitionRef.current.onend = () => setIsListening(false);
@@ -36,60 +46,71 @@ function App() {
     }
   }, []);
 
+  // -------------------- Auto-scroll to bottom when messages update --------------------
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // -------------------- Toggle Microphone --------------------
   const toggleMicrophone = () => {
     if (!recognitionRef.current) {
       alert('Speech recognition not supported in your browser');
       return;
     }
-    if (isListening) {
-      recognitionRef.current.stop();
-    } else {
+    if (isListening) recognitionRef.current.stop();
+    else {
       recognitionRef.current.start();
       setIsListening(true);
     }
   };
 
+  // -------------------- Send Message --------------------
   const sendMessage = async () => {
     const text = inputText.trim();
     if (!text || isProcessing) return;
 
+    // Add user message to chat
     setMessages(prev => [...prev, { type: 'user', text, timestamp: new Date() }]);
     setInputText('');
     setIsProcessing(true);
 
     try {
-      // const res = await fetch('/api/message', {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/message`, {
+      const res = await fetch(`${API_URL}/api/message`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ session_id: sessionId, text })
       });
-      const data = await res.json();
-      setSessionId(data.session_id);
 
+      const data = await res.json();
+      setSessionId(data.session_id); // Save session ID for future requests
+
+      // Add AI response to chat
       setMessages(prev => [...prev, { type: 'ai', text: data.text, timestamp: new Date() }]);
 
+      // Play audio if available (prepend backend URL)
       if (data.audio_path) {
-        const audio = new Audio(data.audio_path);
-        audio.play().catch(() => console.log("Audio play blocked - user interaction required"));
+        const audio = new Audio(`${API_URL}${data.audio_path}`);
+        audio.play().catch(() =>
+          console.log("Audio play blocked - user interaction required")
+        );
       }
     } catch (err) {
       console.error(err);
-      setMessages(prev => [...prev, {
-        type: 'ai',
-        text: 'Sorry sir, network issue ho gaya. Ek baar phir try karein.',
-        timestamp: new Date()
-      }]);
+      setMessages(prev => [
+        ...prev,
+        {
+          type: 'ai',
+          text: 'Sorry sir, network issue ho gaya. Ek baar phir try karein.',
+          timestamp: new Date()
+        }
+      ]);
     } finally {
       setIsProcessing(false);
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  // -------------------- Handle Enter Key --------------------
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
@@ -101,26 +122,26 @@ function App() {
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-emerald-100">
 
-          {/* PREMIUM HEADER WITH LOGO */}
+          {/* -------------------- Header -------------------- */}
           <div className="bg-gradient-to-r from-emerald-900 via-teal-600 to-cyan-700 p-6 relative overflow-hidden">
             <div className="absolute inset-0 opacity-30">
-              <div 
-                className="absolute inset-0" 
+              <div
+                className="absolute inset-0"
                 style={{
-                  backgroundImage: 'url("data:image/svg+xml,%3Csvg width="70" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.1"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
+                  backgroundImage:
+                    'url("data:image/svg+xml,%3Csvg width=\'70\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
                 }}
               />
             </div>
 
             <div className="relative flex items-center gap-5">
               <div className="w-16 h-16 bg-white rounded-2xl shadow-2xl flex items-center justify-center border-0 border-white/50">
-                <img 
-                  src="/logo.png" 
-                  alt="Riverwood Logo" 
+                <img
+                  src="/logo.png"
+                  alt="Riverwood Logo"
                   className="w-full h-full object-contain rounded-xl"
                 />
               </div>
-
               <div>
                 <h1 className="text-2xl font-bold text-white tracking-wide">
                   Riverwood Voice Agent
@@ -139,7 +160,7 @@ function App() {
             </div>
           </div>
 
-          {/* CHAT AREA */}
+          {/* -------------------- Chat Area -------------------- */}
           <div className="h-[500px] overflow-y-auto p-6 bg-gradient-to-b from-slate-50 to-white">
             {messages.length === 0 ? (
               <div className="h-full flex items-center justify-center">
@@ -148,7 +169,9 @@ function App() {
                     <Mic className="w-12 h-12 text-white" />
                   </div>
                   <h3 className="text-2xl font-bold text-emerald-800 mb-2">Namaste Sir!</h3>
-                  <p className="text-emerald-600 text-lg">Riverwood speaking from Riverwood Estate</p>
+                  <p className="text-emerald-600 text-lg">
+                    Riverwood speaking from Riverwood Estate
+                  </p>
                   <p className="text-slate-600 mt-3">Bolo sir, kaisa chal raha hai?</p>
                 </div>
               </div>
@@ -167,13 +190,15 @@ function App() {
                       }`}
                     >
                       <p className="text-base leading-relaxed font-medium">{msg.text}</p>
-                      <p className={`text-xs mt-2 font-light ${
-                        msg.type === 'user' ? 'text-emerald-100' : 'text-emerald-500'
-                      }`}>
-                        {msg.timestamp.toLocaleTimeString('en-IN', { 
-                          hour: '2-digit', 
+                      <p
+                        className={`text-xs mt-2 font-light ${
+                          msg.type === 'user' ? 'text-emerald-100' : 'text-emerald-500'
+                        }`}
+                      >
+                        {msg.timestamp.toLocaleTimeString('en-IN', {
+                          hour: '2-digit',
                           minute: '2-digit',
-                          hour12: true 
+                          hour12: true,
                         })}
                       </p>
                     </div>
@@ -185,7 +210,9 @@ function App() {
                     <div className="bg-white border-2 border-emerald-200 rounded-3xl px-6 py-4 shadow-lg">
                       <div className="flex items-center gap-3">
                         <Loader2 className="w-5 h-5 animate-spin text-emerald-600" />
-                        <span className="text-emerald-700 font-medium">Riverwood soch raha hai...</span>
+                        <span className="text-emerald-700 font-medium">
+                          Riverwood soch raha hai...
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -195,7 +222,7 @@ function App() {
             )}
           </div>
 
-          {/* INPUT BAR */}
+          {/* -------------------- Input Bar -------------------- */}
           <div className="p-6 bg-white border-t-4 border-emerald-500">
             <div className="flex gap-4 items-end">
               <button
@@ -213,8 +240,8 @@ function App() {
               <div className="flex-1">
                 <textarea
                   value={inputText}
-                  onChange={(e) => setInputText(e.target.value)}
-                  onKeyPress={handleKeyPress}
+                  onChange={e => setInputText(e.target.value)}
+                  onKeyDown={handleKeyDown} // Use onKeyDown instead of onKeyPress
                   placeholder="Bolo sir... ya type kariye"
                   rows={1}
                   disabled={isProcessing}
