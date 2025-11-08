@@ -1,6 +1,7 @@
 // frontend/project/src/App.tsx
 import { useState, useRef, useEffect } from 'react';
 import { Mic, MicOff, Send, Volume2, Loader2 } from 'lucide-react';
+import.meta.env.VITE_API_URL
 
 interface Message {
   type: 'user' | 'ai';
@@ -62,7 +63,7 @@ function App() {
 
     try {
       // const res = await fetch('/api/message', {
-      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/message`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/message`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ session_id: sessionId, text })
