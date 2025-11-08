@@ -1,4 +1,4 @@
-# I Built India’s Warmest AI Site Supervisor in 6 Hours
+# 🏗️ I Built India’s Warmest AI Site Supervisor — in Just 6 Hours
 
 Meet **riverwood-AI** — your friendly AI *dost* from *Riverwood Estate, Kharkhauda*!  
 He remembers your last chat, speaks Hindi, English, or English perfectly, and asks you the most important question —  
@@ -123,5 +123,6 @@ December 2026 mein aapke haath mein registry!
 
 
 ## 🏁 Final Thought
+
 
 *"riverwood-AI isn't just an AI — he's that friendly site supervisor who never forgets your chai order."* ☕
