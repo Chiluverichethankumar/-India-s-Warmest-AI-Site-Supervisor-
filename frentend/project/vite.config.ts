@@ -1,19 +1,28 @@
-// frontend/project/vite.config.ts
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+// // frontend/project/vite.config.ts
+// import { defineConfig } from 'vite'
+// import react from '@vitejs/plugin-react'
+
+// export default defineConfig({
+//   plugins: [react()],
+//   server: {
+//     proxy: {
+//       '/api': {
+//         target: 'http://localhost:8000',
+//         changeOrigin: true,
+//       },
+//       '/memory': {
+//         target: 'http://localhost:8000',
+//         changeOrigin: true,
+//       }
+//     }
+//   }
+// })
 
 export default defineConfig({
-  plugins: [react()],
   server: {
     proxy: {
-      '/api': {
-        target: 'http://localhost:8000',
-        changeOrigin: true,
-      },
-      '/memory': {
-        target: 'http://localhost:8000',
-        changeOrigin: true,
-      }
-    }
-  }
-})
+      '/api': 'https://riverwood-ai-backend.onrender.com',
+      '/memory': 'https://riverwood-ai-backend.onrender.com',
+    },
+  },
+});
