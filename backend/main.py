@@ -306,7 +306,8 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:5173",
         "http://127.0.0.1:5173",
-        "https://riverwood-voice-agent-frontend.vercel.app"
+        "https://riverwood-voice-agent-frontend.vercel.app",
+        "https://5b215cbc-1ad7-4c5e-98b6-f64c15b1b543-00-21fo8zr548pv6.janeway.replit.dev"
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -494,6 +495,7 @@ async def home():
 async def health():
     """Health check"""
     return {"status": "Riverwood AI is LIVE from Kharkhauda site office! 🏗️"}
+
 
 
 
