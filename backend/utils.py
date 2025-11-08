@@ -3,4 +3,4 @@
 
 
 def format_update(site_name, percent_done):
-return f"{site_name} update: {percent_done}% complete. Groundwork done, finishing next."
+    return f"{site_name} update: {percent_done}% complete. Groundwork done, finishing next."
