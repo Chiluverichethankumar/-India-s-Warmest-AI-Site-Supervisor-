@@ -1,28 +1,25 @@
-// // frontend/project/vite.config.ts
+// frontend/project/vite.config.ts
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// export default defineConfig({
-//   plugins: [react()],
-//   server: {
-//     proxy: {
-//       '/api': {
-//         target: 'http://localhost:8000',
-//         changeOrigin: true,
-//       },
-//       '/memory': {
-//         target: 'http://localhost:8000',
-//         changeOrigin: true,
-//       }
-//     }
-//   }
-// })
+// ✅ Detect environment and set backend URL
+const backendUrl =
+  process.env.NODE_ENV === 'production'
+    ? 'https://riverwood-ai-backend.onrender.com'
+    : 'http://localhost:8000'
 
 export default defineConfig({
+  plugins: [react()],
   server: {
     proxy: {
-      '/api': 'https://riverwood-ai-backend.onrender.com',
-      '/memory': 'https://riverwood-ai-backend.onrender.com',
+      '/api': {
+        target: backendUrl,
+        changeOrigin: true,
+      },
+      '/memory': {
+        target: backendUrl,
+        changeOrigin: true,
+      },
     },
   },
-});
+})
