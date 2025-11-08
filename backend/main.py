@@ -49,7 +49,7 @@ app.add_middleware(
 BASE_DIR = Path(__file__).resolve().parent
 MEMORY_DIR = BASE_DIR / "memory"
 MEMORY_DIR.mkdir(exist_ok=True)
-DIST_DIR = BASE_DIR.parent / "frentend" / "project" / "dist"  # ✅ frontend build folder
+DIST_DIR = BASE_DIR.parent / "frentend" / "project" 
 
 # Serve saved audio memory files (for playback)
 app.mount("/memory", StaticFiles(directory=MEMORY_DIR), name="memory")
@@ -261,3 +261,4 @@ Keep reply under 2 short sentences.
 async def health():
     """Simple check if backend is running"""
     return {"status": "Riverwood AI is LIVE from Kharkhauda site office! 🏗️"}
+
