@@ -32,8 +32,8 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/api': { target: 'https://5b215cbc-1ad7-4c5e-98b6-f64c15b1b543-00-21fo8zr548pv6.janeway.replit.dev:8000', changeOrigin: true },
-      '/memory': { target: 'https://5b215cbc-1ad7-4c5e-98b6-f64c15b1b543-00-21fo8zr548pv6.janeway.replit.dev:8000', changeOrigin: true },
+      '/api': { target: 'https://5b215cbc-1ad7-4c5e-98b6-f64c15b1b543-00-21fo8zr548pv6.janeway.replit.dev', changeOrigin: true },
+      '/memory': { target: 'https://5b215cbc-1ad7-4c5e-98b6-f64c15b1b543-00-21fo8zr548pv6.janeway.replit.dev', changeOrigin: true },
     },
   },
 });
