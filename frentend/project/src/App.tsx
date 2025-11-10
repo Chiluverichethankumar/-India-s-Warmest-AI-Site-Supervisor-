@@ -351,10 +351,17 @@ function App() {
 
       setMessages(prev => [...prev, { type: 'ai', text: data.text, timestamp: new Date() }]);
 
-      if (data.audio_path) {
-        const audio = new Audio(data.audio_path);
-        audio.play().catch(() => console.log("Audio play blocked - user interaction required"));
-      }
+    if (data.audio_path) {
+      const audioUrl = `${import.meta.env.VITE_API_URL}${data.audio_path}`;
+      console.log("Playing voice:", audioUrl); // Debug
+    
+      const audio = new Audio(audioUrl);
+      audio.volume = 1.0;
+      audio.play().catch(err => {
+        console.error("Voice blocked:", err);
+        alert("Click anywhere to enable sound!");
+      });
+    }
     } catch (err) {
       console.error(err);
       setMessages(prev => [...prev, {
